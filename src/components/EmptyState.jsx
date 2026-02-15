@@ -1,3 +1,7 @@
+/**
+ * EmptyState Component
+ * Displayed when there are no active drops
+ */
 const EmptyState = () => {
   return (
     <div className="bg-gray-800 rounded-lg p-12 text-center">

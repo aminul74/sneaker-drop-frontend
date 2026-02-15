@@ -1,29 +1,21 @@
-import { useState } from "react";
 import { useToast } from "../hooks/useToast";
 import { useRealTimeDrops } from "../hooks/useRealTimeDrops";
 import Header from "../components/Header";
 import Toast from "../components/Toast";
 import EmptyState from "../components/EmptyState";
 import DropsGrid from "../components/DropsGrid";
-import ReservationModal from "../components/ReservationModal";
 
+/**
+ * HomePage
+ * Main page displaying sneaker drops with real-time updates
+ */
 const HomePage = () => {
   const { drops, loading, error, refetch } = useRealTimeDrops();
-  const [selectedDrop, setSelectedDrop] = useState(null);
   const { message, showMessage } = useToast();
-
-  const handleReserve = (drop) => {
-    setSelectedDrop(drop);
-  };
 
   const handleSuccess = (msg) => {
     showMessage(msg);
-    setSelectedDrop(null);
     refetch(); // Refresh drops after successful purchase
-  };
-
-  const handleClose = () => {
-    setSelectedDrop(null);
   };
 
   const handleRetry = () => {
@@ -69,17 +61,9 @@ const HomePage = () => {
         {drops.length === 0 ? (
           <EmptyState />
         ) : (
-          <DropsGrid drops={drops} onReserve={handleReserve} />
+          <DropsGrid drops={drops} onSuccess={handleSuccess} />
         )}
       </main>
-
-      {selectedDrop && (
-        <ReservationModal
-          drop={selectedDrop}
-          onClose={handleClose}
-          onSuccess={handleSuccess}
-        />
-      )}
     </div>
   );
 };

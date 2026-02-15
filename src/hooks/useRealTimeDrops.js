@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { useSocket } from "./useSocket";
+import config from "../utils/config";
 
-const API_BASE_URL = "http://localhost:3001/api";
-
+/**
+ * Transform API response data into frontend format
+ * Maps database field names to component prop names
+ */
 const transformDropData = (apiData) => {
   return apiData.map((drop) => ({
     id: drop.id,
@@ -11,11 +14,16 @@ const transformDropData = (apiData) => {
     available: drop.available_stock,
     total: drop.total_stock,
     startTime: drop.start_time,
-    image: drop.imageUrl || "",
+    image: drop.image_url || "",
     purchasers: drop.Purchases || [],
   }));
 };
 
+/**
+ * Hook: useRealTimeDrops
+ * Fetches drops data and subscribes to real-time updates via WebSocket
+ * Handles stock updates and purchase completions
+ */
 export const useRealTimeDrops = () => {
   const [drops, setDrops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +34,7 @@ export const useRealTimeDrops = () => {
   const fetchDrops = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/drops`);
+      const response = await fetch(`${config.apiUrl}/drops`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch drops");
@@ -36,7 +44,6 @@ export const useRealTimeDrops = () => {
       const transformed = transformDropData(data);
       setDrops(transformed);
     } catch (err) {
-      console.error("Error fetching drops:", err);
       setError("Failed to load drops");
     } finally {
       setLoading(false);
@@ -49,7 +56,6 @@ export const useRealTimeDrops = () => {
 
     // Subscribe to real-time stock updates
     const unsubscribeStock = on("stock_update", (data) => {
-      console.log("Stock update received:", data);
       setDrops((prevDrops) =>
         prevDrops.map((drop) =>
           drop.id === data.dropId
@@ -61,7 +67,6 @@ export const useRealTimeDrops = () => {
 
     // Subscribe to purchase updates
     const unsubscribePurchase = on("purchase_complete", (data) => {
-      console.log("Purchase completed:", data);
       // Refresh drops to get updated purchaser list
       fetchDrops();
     });

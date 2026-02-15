@@ -3,6 +3,11 @@ import io from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
 
+/**
+ * Hook: useSocket
+ * Manages WebSocket connection lifecycle
+ * Provides methods to listen and emit events
+ */
 export const useSocket = () => {
   const socketRef = useRef(null);
   const [connected, setConnected] = useState(false);
@@ -19,17 +24,11 @@ export const useSocket = () => {
       });
 
       socketRef.current.on("connect", () => {
-        console.log("WebSocket connected:", socketRef.current.id);
         setConnected(true);
       });
 
       socketRef.current.on("disconnect", () => {
-        console.log("WebSocket disconnected");
         setConnected(false);
-      });
-
-      socketRef.current.on("error", (error) => {
-        console.error("WebSocket error:", error);
       });
     }
 

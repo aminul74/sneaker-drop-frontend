@@ -1,3 +1,7 @@
+/**
+ * Toast Component
+ * Displays success/error notifications at the top-right
+ */
 const Toast = ({ message }) => {
   if (!message) return null;
 

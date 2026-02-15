@@ -1,5 +1,9 @@
 import { useState, useCallback } from "react";
 
+/**
+ * Hook: useToast
+ * Manages temporary toast notification messages
+ */
 export const useToast = () => {
   const [message, setMessage] = useState("");
 

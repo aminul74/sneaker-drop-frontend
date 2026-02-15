@@ -1,3 +1,7 @@
+/**
+ * Header Component
+ * Displays the main title and tagline
+ */
 const Header = () => {
   return (
     <header className="max-w-7xl mx-auto mb-8 text-center">

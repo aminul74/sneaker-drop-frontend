@@ -1,268 +1,170 @@
 # 👟 Sneaker Drop Frontend
 
-A modern, real-time sneaker drop tracking and reservation application built with React, Vite, and Tailwind CSS. Get instant notifications for limited-edition shoe releases and reserve your pairs before they sell out!
+A real-time sneaker drop platform with live inventory updates and atomic reservations.
 
 ## ✨ Features
 
-- **Real-Time Updates** - Live inventory tracking with Socket.IO for instant stock updates
-- **Countdown Timers** - Dynamic countdown for upcoming drops with hours and minutes display
-- **Reservation System** - Quick reservation process with 60-second confirmation window
-- **Responsive Design** - Mobile-first approach supporting all device sizes
-- **Smooth Animations** - Polished UI with hover effects, transitions, and loading states
-- **Toast Notifications** - Non-intrusive feedback system for user actions
-- **Beautiful UI** - Dark theme with gradient backgrounds and modern card layouts
-- **Size Selection** - Support for multiple shoe sizes (US 7 to 12)
+- **Real-Time Updates** - Live stock synchronization via WebSocket across all clients
+- **60-Second Reservations** - Timed checkout window with automatic expiry
+- **Activity Feed** - Recent purchaser list updated in real-time
+- **Persistent State** - Reservations survive page reloads via localStorage
+- **Responsive Design** - Mobile-first layout with Tailwind CSS
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework** - React 19.2
-- **Build Tool** - Vite 7.3
-- **Styling** - Tailwind CSS 4.1
-- **Real-Time Communication** - Socket.IO Client 4.8
-- **Linting** - ESLint 9.39
-- **Package Manager** - npm
+- **React 19** with Hooks
+- **Vite 7** for fast builds
+- **Tailwind CSS 4** for styling
+- **Socket.IO** for real-time communication
+- **localStorage** for state persistence
 
 ## 📁 Project Structure
 
 ```
-sneaker-drop-frontend/
-├── src/
-│   ├── components/
-│   │   ├── DropCard.jsx           # Individual drop card component
-│   │   ├── DropsGrid.jsx          # Grid layout for drops
-│   │   ├── ReservationModal.jsx   # Reservation form modal
-│   │   ├── EmptyState.jsx         # Empty state display
-│   │   ├── Toast.jsx              # Notification component
-│   │   ├── Header.jsx             # App header
-│   │   └── index.js               # Components barrel export
-│   ├── hooks/
-│   │   ├── useSocket.js           # Socket.IO connection hook
-│   │   ├── useRealTimeDrops.js    # Real-time drops data hook
-│   │   ├── useToast.js            # Toast notifications hook
-│   │   └── index.js               # Hooks barrel export
-│   ├── pages/
-│   │   └── HomePage.jsx           # Main home page
-│   ├── static/
-│   │   └── constants.js           # App constants
-│   ├── utils/
-│   │   └── config.js              # Configuration file
-│   ├── assets/                    # Static assets
-│   ├── App.jsx                    # Main App component
-│   ├── App.css                    # App styles
-│   ├── main.jsx                   # Entry point
-│   └── index.css                  # Global styles
-├── public/                        # Public assets
-├── package.json                   # Dependencies
-├── vite.config.js                 # Vite configuration
-├── tailwind.config.js             # Tailwind configuration
-├── postcss.config.js              # PostCSS configuration
-├── eslint.config.js               # ESLint configuration
-└── README.md                      # This file
+src/
+├── components/      # DropCard, DropsGrid, Toast, Header
+├── hooks/           # useSocket, useRealTimeDrops, useToast
+├── services/        # dropService (API calls)
+├── pages/           # HomePage
+├── utils/           # Configuration
+└── static/          # Constants
 ```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
-- Backend API server running on `http://localhost:3001`
+- Node.js v16+
+- Backend API running (default: `http://localhost:3001`)
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+# Clone and install
+git clone <repository-url>
+cd sneaker-drop-frontend
+npm install
 
-   ```bash
-   git clone https://github.com/yourusername/sneaker-drop-frontend.git
-   cd sneaker-drop-frontend
-   ```
+# Configure environment
+# Create .env file:
+VITE_API_URL=http://localhost:3001/api
+VITE_SOCKET_URL=http://localhost:3001
 
-2. **Install dependencies**
+# Start development server
+npm run dev
+```
 
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   # Create a .env file in the root directory
-   VITE_API_URL=http://localhost:3001/api
-   VITE_SOCKET_URL=http://localhost:3001
-   ```
-
-4. **Start the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-   The app will be available at `http://localhost:5173`
+Application runs at `http://localhost:5173`
 
 ## 📝 Available Scripts
 
-| Script            | Description                              |
-| ----------------- | ---------------------------------------- |
-| `npm run dev`     | Start development server with hot reload |
-| `npm run build`   | Build for production                     |
-| `npm run lint`    | Run ESLint to check code quality         |
-| `npm run preview` | Preview production build locally         |
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# API Configuration
-VITE_API_URL=http://localhost:3001/api
-VITE_SOCKET_URL=http://localhost:3001
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
 ```
 
-### Tailwind CSS Configuration
+## 🏗️ Architecture
 
-The project uses Tailwind CSS v4 with custom theme configuration in `tailwind.config.js`:
+### DropCard Component (Three Modes)
 
-- Custom color palette with dark theme
-- Responsive breakpoints for mobile-first design
-- Custom animations for smooth transitions
+1. **Card Mode** - Display drop info + "Reserve Now" button
+2. **Form Mode** - Collect user details (name, email, size)
+3. **Reserved Mode** - Show 60-second timer + "Complete Purchase" button
 
-## 🎨 Component Overview
+The component uses localStorage to persist reservations across page reloads.
 
-### DropCard
+### Real-Time Flow
 
-Displays individual sneaker drop information with:
+```
+Backend → WebSocket → useSocket → useRealTimeDrops → React State → UI Update
+```
 
-- Product image or placeholder
-- Countdown timer
-- Price and availability
-- Reserve button with hover effects
+**Events:**
 
-### ReservationModal
+- `stock_update` - Updates available inventory
+- `purchase_complete` - Refreshes purchaser list
 
-Modal form for making reservations with:
+### API Endpoints
 
-- User information collection
-- Size selection dropdown
-- Real-time countdown timer (60 seconds)
-- Purchase confirmation flow
-
-### Toast
-
-Non-intrusive notification system for:
-
-- Successful reservations
-- Purchase confirmations
-- Error messages
-
-### DropsGrid
-
-Responsive grid layout with proper alignment:
-
-- 1 column on mobile
-- 2 columns on tablet
-- 3 columns on desktop
-
-## 🔌 API Integration
-
-The frontend communicates with the backend through:
-
-**REST API Endpoints:**
-
-- `GET /api/drops` - Fetch all available drops
-- `POST /api/drops/reserve` - Create a reservation
-- `POST /api/drops/purchase` - Complete purchase
-
-**WebSocket Events:**
-
-- `stock-updated` - Receive real-time stock updates
-- `drop-started` - New drop has started
-- `drop-sold-out` - Drop has sold out
-
-## 🎯 Key Features Explained
-
-### Real-Time Updates
-
-The app uses Socket.IO to maintain a persistent connection with the backend for instant inventory updates without page refreshes.
-
-### Countdown Timer
-
-Each drop displays a live countdown showing hours and minutes until the release. Once live, it displays "LIVE NOW!" status.
-
-### Reservation Window
-
-After reserving an item, users have 60 seconds to complete the purchase. The timer counts down in the modal, and the reservation expires if not completed in time.
-
-### Responsive Design
-
-Built with Tailwind CSS to ensure consistent experience across all devices:
-
-- Mobile phones (320px+)
-- Tablets (768px+)
-- Desktops (1024px+)
+- `GET /api/drops` - Fetch all drops
+- `POST /api/drops/reserve` - Reserve a drop (returns reservationId)
+- `POST /api/drops/purchase` - Complete purchase with reservationId
 
 ## 🐛 Troubleshooting
 
-### WebSocket Connection Issues
+**WebSocket not connecting?**
 
-- Ensure backend server is running on `http://localhost:3001`
+- Ensure backend is running at `http://localhost:3001`
 - Check CORS settings on backend
-- Verify `VITE_SOCKET_URL` environment variable
+- Verify `VITE_SOCKET_URL` in `.env`
 
-### API Errors
+**API requests failing?**
 
-- Confirm backend API is accessible
-- Check network tab in browser DevTools
-- Verify token/authentication if required
+- Verify backend API is accessible
+- Check Network tab in DevTools
+- Confirm `VITE_API_URL` is correct
 
-### Build Issues
+**Reservation lost on reload?**
 
-- Clear `node_modules` and reinstall: `rm -rf node_modules && npm install`
-- Clear Vite cache: `rm -rf .vite`
+- Check if browser is in private/incognito mode (blocks localStorage)
+- Try a different browser
 
-## 📦 Production Build
+**Build errors?**
 
-To build for production:
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## 📦 Deployment
+
+### Build for Production
 
 ```bash
 npm run build
+# Output: dist/ folder
 ```
 
-This creates an optimized build in the `dist/` directory ready for deployment.
+### Environment Variables
 
-Preview the production build locally:
+Set these in your hosting platform:
+
+```env
+VITE_API_URL=https://api.yourdomain.com/api
+VITE_SOCKET_URL=https://api.yourdomain.com
+```
+
+### Deploy to Vercel
 
 ```bash
-npm run preview
+npm install -g vercel
+vercel --prod
 ```
+
+**Other Options:** Netlify, AWS S3, GitHub Pages
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Please:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+**Code Style:**
+
+- Use functional components with React Hooks
+- Follow ESLint configuration
+- Keep components focused and reusable
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👨‍💻 Author
-
-Created with ❤️ for sneaker enthusiasts
-
-## 🔗 Related Projects
-
-- [Sneaker Drop Backend](https://github.com/aminul74/sneaker-drop-backend) - Backend API server
-
-## 📧 Support
-
-For support, email a.soton7@gmail.com or open an issue in the GitHub repository.
+MIT License - See LICENSE file for details
 
 ---
 
-**Happy sneaker hunting! 👟✨**
+**Built with ⚡ Vite, ⚛️ React, and 🎨 Tailwind CSS**
